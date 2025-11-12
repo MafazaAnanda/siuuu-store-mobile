@@ -37,8 +37,8 @@ class _ItemFormPageState extends State<ItemFormPage> {
             "Add Item Form"
           ),
         ),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       drawer: LeftDrawer(),
       body: Form(
@@ -66,6 +66,9 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     if (value == null || value.isEmpty) {
                       return "Nama Item tidak boleh kosong!";
                     }
+                    if (value.length < 3) {
+                      return "Nama Item minimal 3 karakter!";
+                    }
                     return null;
                   },
                 ),
@@ -92,8 +95,8 @@ class _ItemFormPageState extends State<ItemFormPage> {
                       return "Harga Item tidak boleh kosong!";
                     }
                     final intValue = int.tryParse(value);
-                    if (intValue == null || intValue < 0) {
-                      return "Harga Item tidak valid!";
+                    if (intValue == null || intValue <= 0) {
+                      return "Harga Item harus lebih besar dari 0!";
                     }
                     return null;
                   },
@@ -118,6 +121,9 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     if (value == null || value.isEmpty) {
                       return "Deskripsi Item tidak boleh kosong!";
                     }
+                     if (value.length < 10) {
+                      return "Deskripsi Item minimal 10 karakter!";
+                    }
                     return null;
                   },
                 ),
@@ -126,7 +132,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   decoration: InputDecoration(
-                    hintText: "Thumbnail Item (Opsional)",
+                    hintText: "Thumbnail Item (URL)", 
                     labelText: "Thumbnail Item",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
@@ -136,6 +142,18 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     setState(() {
                       _thumbnail = value!;
                     });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Thumbnail Item tidak boleh kosong!";
+                    }
+                    final uri = Uri.tryParse(value);
+                    if (uri == null || 
+                        !uri.isAbsolute || 
+                        (!uri.scheme.startsWith('http'))) {
+                      return "Masukkan URL thumbnail yang valid (http/https)!";
+                    }
+                    return null;
                   },
                 ),
               ),
@@ -198,7 +216,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     }
                     final intValue = int.tryParse(value);
                     if (intValue == null || intValue < 0) {
-                      return "Stok Item tidak valid!";
+                      return "Stok Item tidak boleh negatif!";
                     }
                     return null;
                   },
@@ -216,12 +234,15 @@ class _ItemFormPageState extends State<ItemFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _description = value!;
+                      _brand = value!;
                     });
                   },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return "Brand Item tidak boleh kosong!";
+                    }
+                    if (value.length < 2) {
+                      return "Brand Item minimal 2 karakter!";
                     }
                     return null;
                   },
@@ -234,7 +255,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: 
-                        MaterialStateProperty.all(Colors.indigo),
+                        MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -254,7 +275,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                                   Text('Kategori: $_category'),
                                   Text('Unggulan: ${_isFeatured ? "Ya" : "Tidak"}'),
                                   Text('Stok: $_stock'),
-                                  Text('Brand: $_brand'),
+                                  Text('Brand: $_brand'), 
                                 ],
                               ),
                             ),
@@ -264,6 +285,16 @@ class _ItemFormPageState extends State<ItemFormPage> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                   _formKey.currentState!.reset();
+                                  setState(() {
+                                    _name = "";
+                                    _price = 0;
+                                    _description = "";
+                                    _thumbnail = "";
+                                    _category = "jersey";
+                                    _isFeatured = false;
+                                    _stock = 0;
+                                    _brand = "";
+                                  });
                                 },
                               )
                             ],
@@ -274,7 +305,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                     },
                     child: const Text(
                       "Save",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                     ),
                   ),
                 ),   

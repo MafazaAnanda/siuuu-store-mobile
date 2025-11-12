@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siuuu_store/screeens/itemlist_form.dart';
-import 'package:siuuu_store/screeens/menu.dart';
+import 'package:siuuu_store/screens/itemlist_form.dart';
+import 'package:siuuu_store/screens/menu.dart';
 
 class ItemCard extends StatelessWidget {
   final ItemHomepage itemHomePage;

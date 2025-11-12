@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:siuuu_store/screeens/itemlist_form.dart';
+import 'package:siuuu_store/screens/itemlist_form.dart';
 import 'package:siuuu_store/widgets/left_drawer.dart';
 import 'package:siuuu_store/widgets/item_card.dart';
 

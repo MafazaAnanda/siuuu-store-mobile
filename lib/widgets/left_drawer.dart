@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siuuu_store/screeens/itemlist_form.dart';
-import 'package:siuuu_store/screeens/menu.dart';
+import 'package:siuuu_store/screens/itemlist_form.dart';
+import 'package:siuuu_store/screens/menu.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -12,7 +12,7 @@ class LeftDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.indigo,
+              color: Theme.of(context).colorScheme.primary,
             ),
             child: Column(
               children: [
@@ -22,7 +22,7 @@ class LeftDrawer extends StatelessWidget {
                   style:TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(10)),
