@@ -303,7 +303,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
                         );
                       }
                     },
-                    child: const Text(
+                    child: Text(
                       "Save",
                       style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                     ),
