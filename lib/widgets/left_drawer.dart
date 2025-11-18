@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:siuuu_store/screens/itemlist_form.dart';
 import 'package:siuuu_store/screens/menu.dart';
+import 'package:siuuu_store/screens/item_entry_list.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -62,6 +63,16 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.add_reaction_rounded),
+            title: const Text('Item List'),
+            onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ItemEntryListPage()),
+                );
+            },
+        ),
         ],
       )
     );

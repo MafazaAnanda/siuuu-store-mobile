@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:siuuu_store/screens/login.dart';
 import 'package:siuuu_store/screens/menu.dart';
 
 void main() {
@@ -10,13 +13,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SIUUU STORE ',
-      theme: ThemeData(
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+        title: 'SIUUU STORE ',
+        theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
         .copyWith(secondary: Colors.indigoAccent[400]),
+        ),
+      home: const LoginPage()
       ),
-      home: MyHomePage(),
     );
   }
 }
