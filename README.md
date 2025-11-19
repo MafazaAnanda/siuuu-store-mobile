@@ -52,3 +52,42 @@ Memanfaatkan Scaffold sebagai kerangka dasar (struktur visual) untuk setiap hala
 
 *Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
 Untuk menciptakan identitas visual yang konsisten adalah dengan mendefinisikan skema warna brand (misalnya, primaryColor, secondaryColor) secara terpusat di dalam ThemeData pada MaterialApp. Setelah itu dapat mengakses warna-warna ini di seluruh aplikasi menggunakan Theme.of(context).colorScheme.primary atau Theme.of(context).colorScheme.secondary
+
+*Tugas 9
+
+*Jelaskan mengapa kita perlu membuat model Dart saat mengambil/mengirim data JSON? Apa konsekuensinya jika langsung memetakan Map<String, dynamic> tanpa model (terkait validasi tipe, null-safety, maintainability)?
+model Dart agar data JSON yang diterima/ dikirim selalu terikat pada tipe yang jelas, aman dari null (null-safety), dan mudah dirawat saat skema berubah.  Jika langsung memakai Map<String, dynamic> tanpa model, validasi tipe bergeser ke runtime (rentan error), banyak cast/cek null tersebar, dan perubahan kunci JSON mudah menimbulkan bug yang sulit dilacak.
+
+*Apa fungsi package http dan CookieRequest dalam tugas ini? Jelaskan perbedaan peran http vs CookieRequest.
+Untuk networking, peran http murni adalah melakukan HTTP request tanpa state sesi, sedangkan CookieRequest dari package pbp_django_auth adalah klien HTTP yang sudah mengelola cookie sesi, CSRF, dan autentikasi sehingga setiap request otomatis menyertakan kredensial. 
+
+*Jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+Instance CookieRequest perlu dibagikan ke semua komponen agar state autentikasi (cookie sesi) konsisten di seluruh layar.
+
+*Jelaskan konfigurasi konektivitas yang diperlukan agar Flutter dapat berkomunikasi dengan Django. Mengapa kita perlu menambahkan 10.0.2.2 pada ALLOWED_HOSTS, mengaktifkan CORS dan pengaturan SameSite/cookie, dan menambahkan izin akses internet di Android? Apa yang akan terjadi jika konfigurasi tersebut tidak dilakukan dengan benar?
+Agar Flutter dapat terhubung dengan Django, server perlu mengizinkan origin aplikasi dan sesi berbasis cookie. Di sisi Django, ALLOWED_HOSTS harus menambahkan 10.0.2.2 jika aplikasi diakses dari Android emulator. Di proyek ini, basis URL memakai http://localhost:8000 yang cocok untuk Flutter Web/Chrome. juga menggunakan endpoint proxy gambar di Django, lalu memuatnya dari Flutter melalui URL proxy pada kartu dan detail item untuk mencegah error CORS saat memuat gambar, seperti terlihat di ItemEntryCard memuat thumbnail via /proxy-image dan di ItemDetailPage. Jika konfigurasi ini salah, request akan gagal (CORS error, cookie tidak terkirim, 403 CSRF, atau SocketException/tidak bisa resolve host).
+
+*Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+berjalan dari input form ke JSON, dikirim ke Django, disimpan, lalu diambil kembali dan dirender. Pada halaman tambah produk, ItemFormPage melakukan validasi form, kemudian mengirim payload JSON lewat request.postJson ke endpoint /add-flutter/. Setelah tersimpan, daftar produk diambil pada ItemEntryListPage melalui fetchItem yang memanggil request.get ke endpoint /json/ atau /json/my-items/, lalu setiap elemen diubah menjadi objek model dengan ItemEntry.fromJson. Data tersebut ditampilkan sebagai list menggunakan FutureBuilder dan ListView, setiap baris dirender oleh ItemEntryCard, dan saat ditekan akan menavigasi ke halaman detail ItemDetailPage untuk menampilkan informasi lengkap.
+
+*Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+dimulai dari halaman login, di mana pengguna memasukkan username dan password pada LoginPage. Kredensial dikirim ke Django melalui request.login, jika berhasil, cookie sesi tersimpan di CookieRequest, pengguna dinavigasi ke beranda MyHomePage, dan SnackBar menampilkan pesan selamat datang. register akun dilakukan di RegisterPage dengan mengirim JSON username, password1, dan password2 melalui request.postJson ke /auth/register/, jika sukses, pengguna diarahkan kembali ke login. Proses logout dilakukan dari menu “Logout” di ItemCard yang memanggil request.logout ke /auth/logout/, menutup sesi di server, menampilkan SnackBar konfirmasi, dan menavigasi ke LoginPage. Selama sesi aktif, seluruh request berikutnya—misalnya mengambil “My Products” di ItemEntryListPage(showMyItems: true)secara otomatis menyertakan cookie dari CookieRequest yang sama sehingga backend dapat  mengenali pengguna yang sedang login.
+
+*Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+1. Integrasi autentikasi Django–Flutter
+    -Di Django: buat app authentication, aktifkan cors-headers dan pengaturan cookie (SameSite=None, Secure=True), tambah “localhost” dan “10.0.2.2” ke ALLOWED_HOSTS, buat view login/register/logout dan daftarkan ke /auth/.
+    -Di Flutter: tambah provider dan pbp_django_auth, bungkus MaterialApp dengan Provider<CookieRequest> di main.dart, set home ke LoginPage, implementasi login (request.login) dan register (request.postJson) lalu navigasi ke MyHomePage.
+
+2. Model kustom
+    -Ambil contoh JSON dari /json/ dan /json/my-items/, buat model ItemEntry menggunakan quicktype lalu masukkan ke item_entry
+
+3. Fetch data dari Django
+    -Aktifkan izin internet di AndroidManifest.
+    -Buat ItemEntryListPage yang memanggil request.get ke /json/ (All Products) atau /json/my-items/ (My Products), parsing ke List<ItemEntry>, tampilkan dengan FutureBuilder + ListView dan ItemEntryCard, serta pasang navigasi dari LeftDrawer dan ItemCard.
+
+4. Integrasi form Flutter → Django
+    -Di Django: buat endpoint /create-flutter/ untuk menerima JSON dan menyimpan data.
+    -Di Flutter: buat ItemFormPage, validasi input, kirim request.postJson ke /create-flutter/, tampilkan SnackBar sukses, lalu kembali ke MyHomePage.
+
+5. Implementasi logout
+    -Di ItemCard, jadikan onTap async untuk opsi “Logout”, panggil request.logout(/auth/logout/), tampilkan SnackBar, dan arahkan ke LoginPage.
